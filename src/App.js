@@ -34,7 +34,7 @@ function App() {
                 });
             loaded = true;
         }
-    }, []);
+    }, [userId]);
 
     const addTask = () => {
         if (taskTitle.trim() === '' || taskDate.trim() === '') return;

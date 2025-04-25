@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using MySql.EntityFrameworkCore.Extensions;
 
 namespace TaskHabitApi.Models
 {
@@ -17,21 +18,32 @@ namespace TaskHabitApi.Models
         {
             base.OnModelCreating(modelBuilder);
 
-            // Настройка таблицы ScheduledMessages
-            modelBuilder.Entity<ScheduledMessage>()
-                .HasKey(sm => sm.Id);
+            Console.WriteLine("Настраиваем таблицы");
 
-            modelBuilder.Entity<ScheduledMessage>()
-                .Property(sm => sm.ChatId)
-                .IsRequired();
+            // Настройка таблицы TaskItem
+            modelBuilder.Entity<TaskItem>(entity => {
+                entity.HasKey(ti => ti.Id);
+                entity.Property(ti => ti.Title).IsRequired();
+                entity.Property(ti => ti.UserId).IsRequired();
+                entity.Property(ti => ti.Date).IsRequired();
+                entity.Property(ti => ti.Done).IsRequired();
+            });
 
-            modelBuilder.Entity<ScheduledMessage>()
-                .Property(sm => sm.MessageText)
-                .IsRequired();
+            modelBuilder.Entity<HabitItem>(entity => {
+                entity.HasKey(hi => hi.Id);
+                entity.Property(hi => hi.Count).IsRequired();
+                entity.Property(hi => hi.UserId).IsRequired();
+                entity.Property(hi => hi.Frequency).IsRequired();
+                entity.Property(hi => hi.Count).IsRequired();
+            });
 
-            modelBuilder.Entity<ScheduledMessage>()
-                .Property(sm => sm.ScheduledTime)
-                .IsRequired();
+            modelBuilder.Entity<ScheduledMessage>(entity => {
+                entity.HasKey(sm => sm.Id);
+                entity.Property(sm => sm.ChatId).IsRequired();
+                entity.Property(sm => sm.MessageText).IsRequired();
+                entity.Property(sm => sm.ScheduledTime).IsRequired();
+                entity.Property(sm => sm.IsSent).IsRequired();
+            });
         }
     }
 }

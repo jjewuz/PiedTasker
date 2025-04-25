@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
+using TaskHabitApi.Models;
 using Telegram.Bot;
 using Telegram.Bot.Types.Enums;
 
@@ -11,10 +12,11 @@ namespace TaskHabitApi.Services
     public class TelegramBotService : IHostedService
     {
         private readonly ITelegramBotClient _botClient;
-        private readonly AppDbContext _dbContext;
+        private AppDbContext _dbContext;
+        private readonly IDbContextFactory<AppDbContext> _dbContextFactory;
         private Timer _timer;
 
-        public TelegramBotService(AppDbContext dbContext)
+        public TelegramBotService(IDbContextFactory<AppDbContext> dbContext)
         {
             // Получаем токен из переменной окружения
             var telegramBotToken = Environment.GetEnvironmentVariable("REACT_APP_BOT_TOKEN");
@@ -24,7 +26,8 @@ namespace TaskHabitApi.Services
             }
 
             _botClient = new TelegramBotClient(telegramBotToken);
-            _dbContext = dbContext;
+            _dbContextFactory = dbContext;
+            _dbContext = _dbContextFactory.CreateDbContext(); 
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
@@ -44,6 +47,11 @@ namespace TaskHabitApi.Services
 
         private async Task CheckAndSendMessages()
         {
+            if (_dbContext == null)
+                _dbContext = _dbContextFactory.CreateDbContext();
+
+            _dbContext.Database.EnsureCreated();
+
             var now = DateTime.UtcNow;
 
             // Получаем сообщения, которые нужно отправить
@@ -56,7 +64,7 @@ namespace TaskHabitApi.Services
                 try
                 {
                     // Отправляем сообщение
-                    await _botClient.SendTextMessageAsync(
+                    await _botClient.SendMessage(
                         chatId: message.ChatId,
                         text: message.MessageText,
                         parseMode: ParseMode.Markdown

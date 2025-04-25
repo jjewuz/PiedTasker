@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using TaskHabitApi.Models;
+using TaskHabitApi.Services;
 
 var filePath = Path.GetFullPath("../.env");
 
@@ -35,13 +36,12 @@ builder.Services.AddCors(options =>
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
-
-
-builder.Services.AddDbContext<AppDbContext>(options =>
+builder.Services.AddDbContextFactory<AppDbContext>(options =>
 {
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
     options.UseMySQL(connectionString);
 });
+
 
 builder.Services.AddHostedService<TelegramBotService>();
 
