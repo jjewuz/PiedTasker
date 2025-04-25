@@ -27,12 +27,9 @@ function App() {
                 .then(ret => {
                     console.log(ret);
                     if (typeof ret !== 'undefined') {
-                        ret.tasks.forEach(element => {
-                            setTasks([...tasks, element]);
-                        });
-                        ret.habits.forEach(element => {
-                            setHabits([...habits, element]);
-                        });
+                        // Обновляем tasks и habits
+                        setTasks(prevTasks => [...prevTasks, ...ret.tasks]);
+                        setHabits(prevHabits => [...prevHabits, ...ret.habits]);
                     }
                 });
             loaded = true;
