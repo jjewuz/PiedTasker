@@ -20,13 +20,24 @@ if (File.Exists(filePath))
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors(options =>  
+{  
+    options.AddPolicy(name: "_myAllowSpecificOrigins",  
+        policy  =>  
+        {  
+            policy.WithOrigins("http://localhost:80",  
+                "http://justnotes.xyz")
+                .AllowAnyHeader()
+                .AllowAnyMethod(); // add the allowed origins  
+        });  
+}); 
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    var connectionString = $"server=localhost;database={Environment.GetEnvironmentVariable("REACT_APP_DATABASE_NAME")};" +
-        $"user={Environment.GetEnvironmentVariable("REACT_APP_DATABASE_USER")};password={Environment.GetEnvironmentVariable("REACT_APP_DATABASE_PASSWORD")}";
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
     options.UseMySQL(connectionString);
 });
 
@@ -34,5 +45,5 @@ var app = builder.Build();
 
 app.UseHttpsRedirection();
 app.MapControllers();
+app.UseCors("_myAllowSpecificOrigins");  
 app.Run();
-

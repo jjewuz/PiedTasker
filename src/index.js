@@ -13,7 +13,6 @@ root.render(
       <Route path="/login" element={<Login />} />
       <Route path="/" element={<App />} />
     </Routes>
-    <Login/>
     
   </BrowserRouter>
 );
