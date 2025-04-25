@@ -35,11 +35,15 @@ builder.Services.AddCors(options =>
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
+
+
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
     options.UseMySQL(connectionString);
 });
+
+builder.Services.AddHostedService<TelegramBotService>();
 
 var app = builder.Build();
 
