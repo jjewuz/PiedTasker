@@ -2,8 +2,6 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import { useNavigate } from "react-router";
 
-let loaded = false;
-
 function App() {
     let navigate = useNavigate();
 
@@ -21,19 +19,16 @@ function App() {
     const [habitFrequency, setHabitFrequency] = useState('ежедневно');
 
     useEffect(() => {
-        if (!loaded) {
-            fetch(`http://localhost:5298/api/tasks/${userId}`, { method: "GET" })
-                .then(res => res.json())
-                .then(ret => {
-                    console.log(ret);
-                    if (typeof ret !== 'undefined') {
-                        // Обновляем tasks и habits
-                        setTasks(prevTasks => [...prevTasks, ...ret.tasks]);
-                        setHabits(prevHabits => [...prevHabits, ...ret.habits]);
-                    }
-                });
-            loaded = true;
-        }
+        fetch(`http://localhost:5298/api/tasks/${userId}`, { method: "GET" })
+            .then(res => res.json())
+            .then(ret => {
+                console.log(ret);
+                if (typeof ret !== 'undefined') {
+                    // Обновляем tasks и habits
+                    setTasks(prevTasks => [...prevTasks, ...ret.tasks]);
+                    setHabits(prevHabits => [...prevHabits, ...ret.habits]);
+                }
+            });
     }, [userId]);
 
     const addTask = () => {
@@ -126,10 +121,20 @@ function App() {
         });
     };
 
+    const logout = () =>
+    {
+        localStorage.removeItem("tg_id");
+        navigate("/login");
+    }
+
     return (
         <div className="container">
             <h1>PiedTracker ALPHA</h1>
             <div className="background"></div>
+
+            <button onClick={logout} className='logout-button'>
+                Выйти
+            </button>
 
             <div className="card-item">
                 <div className="form-container">
