@@ -43,6 +43,8 @@ namespace TaskHabitApi.Models
                 entity.Property(sm => sm.MessageText).IsRequired();
                 entity.Property(sm => sm.ScheduledTime).IsRequired();
                 entity.Property(sm => sm.IsSent).IsRequired();
+                entity.Property(sm => sm.IsHabit).IsRequired();
+                entity.Property(sm => sm.ItemId).IsRequired();
             });
         }
     }

@@ -48,11 +48,13 @@ namespace TaskHabitApi.Services
         private async Task CheckAndSendMessages()
         {
             if (_dbContext == null)
-                _dbContext = _dbContextFactory.CreateDbContext();
+            {
+                _dbContext = _dbContextFactory.CreateDbContext(); 
+            }
 
             _dbContext.Database.EnsureCreated();
 
-            var now = DateTime.UtcNow;
+            var now = DateTime.Now;
 
             // Получаем сообщения, которые нужно отправить
             var messagesToSend = await _dbContext.ScheduledMessages
@@ -70,8 +72,24 @@ namespace TaskHabitApi.Services
                         parseMode: ParseMode.Markdown
                     );
 
-                    // Помечаем сообщение как отправленное
-                    message.IsSent = true;
+                    if (!message.IsHabit)
+                    {
+                        // Помечаем сообщение как отправленное
+                        message.IsSent = true;
+                    }
+                    else 
+                    {
+                        var habit = _dbContext.Habits.Find(message.ItemId);
+                        switch (habit.Frequency) //Resend later
+                        {
+                            case "еженедельная":
+                                message.ScheduledTime = message.ScheduledTime.AddDays(7);
+                            break;
+                            default:
+                                message.ScheduledTime = message.ScheduledTime.AddDays(1);
+                            break;
+                        }
+                    }
                 }
                 catch (Exception ex)
                 {

@@ -56,7 +56,7 @@ function App() {
     };
 
     const deleteTask = (id) => {
-        fetch(`http://localhost:5298/api/tasks/${id}`, {
+        fetch(`http://localhost:5298/api/tasks/task/${id}`, {
             method: 'DELETE'
         }).then(() => {
             setTasks(tasks.filter(t => t.id !== id));
@@ -101,7 +101,7 @@ function App() {
     };
 
     const deleteHabit = (id) => {
-        fetch(`http://localhost:5298/api/tasks/${id}`, {
+        fetch(`http://localhost:5298/api/tasks/habit/${id}`, {
             method: 'DELETE'
         }).then(() => {
             setHabits(habits.filter(h => h.id !== id));
