@@ -17,6 +17,7 @@ function Login() {
                           console.log(data); //TODO Передаём дату в бек и там обрабатываем
                         navigate("/"); 
                       }}
+                      lang='ru'
                   />
         </div>
       </div>
