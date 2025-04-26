@@ -89,6 +89,7 @@ namespace TaskHabitApi.Controllers
         {
             var habitItem = _context.Habits.Find(id);
             if (habitItem == null) return NotFound();
+            Console.WriteLine(habit.Count);
             habitItem.Count = habit.Count;
             _context.SaveChanges();
             return NoContent();

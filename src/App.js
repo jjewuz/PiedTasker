@@ -113,7 +113,7 @@ function App() {
         const updated = { ...habit, count: Math.max(0, habit.count + delta) };
 
         fetch(`http://localhost:5298/api/tasks/habit/${id}`, {
-            method: 'PUT',
+            method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(updated)
         }).then(() => {
