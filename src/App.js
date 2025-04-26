@@ -1,9 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
+import { useNavigate } from "react-router";
 
 function App() {
-    const userId = 'user-1234';
+    let navigate = useNavigate();
 
+    const userId = localStorage.getItem("tg_id");
+    useEffect(() => {
+        if (userId == null) {
+            navigate("/login");
+        }
+    });
     const [tasks, setTasks] = useState([]);
     const [habits, setHabits] = useState([]);
     const [taskTitle, setTaskTitle] = useState('');
@@ -12,26 +19,30 @@ function App() {
     const [habitFrequency, setHabitFrequency] = useState('ежедневно');
 
     useEffect(() => {
-        fetch(`https://justnotes.xyz/api/tasks?userId=${userId}`)
+        fetch(`http://localhost:5298/api/tasks/${userId}`, { method: "GET" })
             .then(res => res.json())
-            .then(setTasks);
-
-        fetch(`https://justnotes.xyz/api/habits?userId=${userId}`)
-            .then(res => res.json())
-            .then(setHabits);
-    }, []);
+            .then(ret => {
+                console.log(ret);
+                if (typeof ret !== 'undefined') {
+                    // Обновляем tasks и habits
+                    setTasks(prevTasks => [...prevTasks, ...ret.tasks]);
+                    setHabits(prevHabits => [...prevHabits, ...ret.habits]);
+                }
+            });
+    }, [userId]);
 
     const addTask = () => {
         if (taskTitle.trim() === '' || taskDate.trim() === '') return;
 
         const newTask = {
-            userId,
+            id: tasks.length + 1,
+            userId: userId,
             title: taskTitle,
             date: taskDate,
             done: false
         };
 
-        fetch('https://justnotes.xyz/api/tasks', {
+        fetch('http://localhost:5298/api/tasks/task', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(newTask)
@@ -45,7 +56,7 @@ function App() {
     };
 
     const deleteTask = (id) => {
-        fetch(`https://justnotes.xyz/api/tasks/${id}`, {
+        fetch(`http://localhost:5298/api/tasks/${id}`, {
             method: 'DELETE'
         }).then(() => {
             setTasks(tasks.filter(t => t.id !== id));
@@ -56,7 +67,7 @@ function App() {
         const task = tasks.find(t => t.id === id);
         const updated = { ...task, done: !task.done };
 
-        fetch(`https://justnotes.xyz/api/tasks/${id}`, {
+        fetch(`http://localhost:5298/api/tasks/task/${id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(updated)
@@ -69,13 +80,14 @@ function App() {
         if (habitName.trim() === '') return;
 
         const newHabit = {
-            userId,
+            id: habits.length + 1,
+            userId: userId,
             name: habitName,
             frequency: habitFrequency,
             count: 0
         };
 
-        fetch('https://justnotes.xyz/api/habits', {
+        fetch('http://localhost:5298/api/tasks/habit', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(newHabit)
@@ -89,7 +101,7 @@ function App() {
     };
 
     const deleteHabit = (id) => {
-        fetch(`https://justnotes.xyz/api/habits/${id}`, {
+        fetch(`http://localhost:5298/api/tasks/${id}`, {
             method: 'DELETE'
         }).then(() => {
             setHabits(habits.filter(h => h.id !== id));
@@ -100,7 +112,7 @@ function App() {
         const habit = habits.find(h => h.id === id);
         const updated = { ...habit, count: Math.max(0, habit.count + delta) };
 
-        fetch(`https://justnotes.xyz/api/habits/${id}`, {
+        fetch(`http://localhost:5298/api/tasks/habit/${id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(updated)
@@ -109,9 +121,20 @@ function App() {
         });
     };
 
+    const logout = () =>
+    {
+        localStorage.removeItem("tg_id");
+        navigate("/login");
+    }
+
     return (
         <div className="container">
             <h1>PiedTracker ALPHA</h1>
+            <div className="background"></div>
+
+            <button onClick={logout} className='logout-button'>
+                Выйти
+            </button>
 
             <div className="card-item">
                 <div className="form-container">

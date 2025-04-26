@@ -1,4 +1,4 @@
-const API_URL = "https://localhost:5001/api"; // поменяй порт, если другой
+const API_URL = "https://localhost:5298/api"; // поменяй порт, если другой
 
 export async function fetchTasks() {
     const res = await fetch(`${API_URL}/tasks`);

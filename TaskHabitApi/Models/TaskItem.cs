@@ -1,8 +1,10 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace TaskHabitApi.Models;
 
 public class TaskItem
 {
-     [Key]
+        [Key]
         public int Id { get; set; }
         public string UserId { get; set; } = string.Empty;
         public string Title { get; set; } = string.Empty;
