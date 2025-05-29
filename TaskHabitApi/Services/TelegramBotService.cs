@@ -77,17 +77,17 @@ namespace TaskHabitApi.Services
                         // Помечаем сообщение как отправленное
                         message.IsSent = true;
                     }
-                    else 
+                    else
                     {
                         var habit = _dbContext.Habits.Find(message.ItemId);
                         switch (habit.Frequency) //Resend later
                         {
                             case "еженедельная":
                                 message.ScheduledTime = message.ScheduledTime.AddDays(7);
-                            break;
+                                break;
                             default:
                                 message.ScheduledTime = message.ScheduledTime.AddDays(1);
-                            break;
+                                break;
                         }
                     }
                 }

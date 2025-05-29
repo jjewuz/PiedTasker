@@ -25,9 +25,10 @@ namespace TaskHabitApi.Controllers
         [HttpPost("task")]
         public IActionResult AddTask([FromBody] TaskItem task)
         {
-            _context.Tasks.Add(task);
             ScheduledMessage msg = new (){Id = _context.ScheduledMessages.Count() + 1, ChatId = Convert.ToInt64(task.UserId), 
             IsSent = false, MessageText = $"Напоминание о задаче: {task.Title}!", ScheduledTime = task.Date, IsHabit = false, ItemId = task.Id};
+            task.LinkedMsg = msg;
+            _context.Tasks.Add(task);
             _context.ScheduledMessages.Add(msg);
             _context.SaveChanges();
             return Ok(task);
@@ -36,7 +37,6 @@ namespace TaskHabitApi.Controllers
         [HttpPost("habit")]
         public IActionResult AddHabit([FromBody] HabitItem habit)
         {
-            _context.Habits.Add(habit);
             DateTime dateTime = DateTime.Now;
             switch (habit.Frequency)
             {
@@ -49,6 +49,8 @@ namespace TaskHabitApi.Controllers
             }
             ScheduledMessage msg = new (){Id = _context.ScheduledMessages.Count() + 1, ChatId = Convert.ToInt64(habit.UserId), 
             IsSent = false, MessageText = $"Напоминание о привычке: {habit.Name}!", ScheduledTime = dateTime, IsHabit = true, ItemId = habit.Id};
+            habit.LinkedMsg = msg;
+            _context.Habits.Add(habit);
             _context.ScheduledMessages.Add(msg);
             _context.SaveChanges();
             return Ok(habit);
@@ -70,6 +72,7 @@ namespace TaskHabitApi.Controllers
             var task = _context.Tasks.Find(id);
             if (task == null) return NotFound();
             _context.Tasks.Remove(task);
+            if (task.LinkedMsg != null) _context.ScheduledMessages.Remove(task.LinkedMsg);
             _context.SaveChanges();
             return NoContent();
         }
@@ -80,6 +83,7 @@ namespace TaskHabitApi.Controllers
             var habit = _context.Habits.Find(id);
             if (habit == null) return NotFound();
             _context.Habits.Remove(habit);
+            if (habit.LinkedMsg != null) _context.ScheduledMessages.Remove(habit.LinkedMsg);
             _context.SaveChanges();
             return NoContent();
         }
@@ -89,7 +93,6 @@ namespace TaskHabitApi.Controllers
         {
             var habitItem = _context.Habits.Find(id);
             if (habitItem == null) return NotFound();
-            Console.WriteLine(habit.Count);
             habitItem.Count = habit.Count;
             _context.SaveChanges();
             return NoContent();

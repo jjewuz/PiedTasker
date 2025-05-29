@@ -10,5 +10,6 @@ namespace TaskHabitApi.Models
         public string Name { get; set; } = string.Empty;
         public string Frequency { get; set; } = "ежедневно";
         public int Count { get; set; }
+        public ScheduledMessage? LinkedMsg { get; set; } = null;
     }
 }
